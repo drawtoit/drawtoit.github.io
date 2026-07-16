@@ -6,4 +6,11 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   base: "/",
   plugins: [react(), tailwindcss()],
+  server: {
+    watch: {
+      // Windows: EBUSY crashes when watching big binaries mid-copy.
+      // Asset changes need a dev-server restart, source HMR unaffected.
+      ignored: ["**/src/assets/**"],
+    },
+  },
 });

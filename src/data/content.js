@@ -13,7 +13,7 @@ export const site = {
 
 export const links = {
   instagram: "https://instagram.com/YOUR_USER",
-  steam: "https://store.steampowered.com/app/YOUR_APP_ID",
+  steam: "https://store.steampowered.com/app/4232500/Hellshot/",
   github: "https://github.com/drawtoit",
   fiverr: "https://fiverr.com/YOUR_USER",
 };
@@ -36,6 +36,7 @@ export const about = {
 export const hellshot = {
   kicker: "Featured project",
   title: "HELLSHOT",
+  tags: ["Bullet Hell", "Pixel Art", "Action", "Indie"],
   description:
     "A fast-paced bullet-hell where every shot counts. Fight your way through the depths, dodge impossible patterns and take down towering bosses — all rendered in hand-crafted pixel art.",
   features: [
@@ -45,17 +46,25 @@ export const hellshot = {
     { icon: "Palette", label: "100% hand-made pixel art" },
   ],
   steamUrl: links.steam,
-  cover: { src: null, alt: "Hellshot key art", seed: 7 },
+  logo: new URL("../assets/Logohellshotajunto2.png", import.meta.url).href,
+  capsule: new URL("../assets/Capsula.png", import.meta.url).href,
+  cover: {
+    video: new URL("../assets/CapsuleHellshot.mp4", import.meta.url).href,
+    alt: "Hellshot key art",
+    seed: 7,
+  },
   screenshots: [
-    { src: null, alt: "Hellshot screenshot 1", seed: 21 },
-    { src: null, alt: "Hellshot screenshot 2", seed: 34 },
-    { src: null, alt: "Hellshot screenshot 3", seed: 55 },
-    { src: null, alt: "Hellshot screenshot 4", seed: 89 },
+    { src: new URL("../assets/Captura1.jpg", import.meta.url).href, alt: "Hellshot screenshot 1", seed: 21 },
+    { src: new URL("../assets/Captura2.jpg", import.meta.url).href, alt: "Hellshot screenshot 2", seed: 34 },
+    { src: new URL("../assets/Captura3.jpg", import.meta.url).href, alt: "Hellshot screenshot 3", seed: 55 },
+    { src: new URL("../assets/Captura4.jpg", import.meta.url).href, alt: "Hellshot screenshot 4", seed: 89 },
   ],
 };
 
 // Masonry gallery. `ratio` controls the tile shape — keep the class
 // strings literal so Tailwind picks them up.
+// Para usar tus imágenes: copia el archivo a src/assets/ y cambia src, p.ej.:
+//   src: new URL("../assets/mi-dibujo.png", import.meta.url).href,
 export const pixelArt = [
   { id: 1, title: "Neon Alley", tag: "Environment", ratio: "aspect-[3/4]", src: null, seed: 11 },
   { id: 2, title: "Bounty Hunter", tag: "Character", ratio: "aspect-square", src: null, seed: 23 },
