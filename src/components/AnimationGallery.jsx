@@ -11,14 +11,14 @@ export default function AnimationGallery() {
         {animations.map((a, i) => (
           <motion.div
             key={a.id}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.5, delay: (i % 3) * 0.08 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: (i % 3) * 0.08 }}
             className="group glass overflow-hidden rounded-2xl"
           >
             <div className="relative aspect-video overflow-hidden">
-              <div className="h-full w-full transition-transform duration-500 group-hover:scale-110">
+              <div className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]">
                 {a.src ? (
                   <img
                     src={a.src}
@@ -31,7 +31,7 @@ export default function AnimationGallery() {
                 )}
               </div>
               {!a.src && (
-                <span className="absolute inset-0 m-auto flex h-12 w-12 items-center justify-center rounded-full border border-neon/50 bg-void/60 text-neon opacity-80 transition-transform duration-300 group-hover:scale-110">
+                <span className="absolute inset-0 m-auto flex h-12 w-12 items-center justify-center rounded-full border border-neon/50 bg-void/60 text-neon opacity-80 transition-transform duration-300 group-hover:scale-105">
                   <Play size={18} className="ml-0.5" />
                 </span>
               )}

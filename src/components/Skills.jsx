@@ -17,7 +17,7 @@ export default function Skills() {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: (i % 3) * 0.08 }}
               whileHover={{ y: -4 }}
               className="glass group rounded-2xl p-6 transition-shadow duration-300 hover:shadow-neon-sm"
             >

@@ -108,7 +108,8 @@ body {
   }
 }
 
-/* CRT overlay: scanlines + vignette + subtle flicker */
+/* CRT overlay: static scanlines + vignette. (Flicker removed — page-wide
+   pulsing distracted from the content.) */
 .crt {
   position: fixed;
   inset: 0;
@@ -123,20 +124,9 @@ body {
       transparent 4px
     ),
     radial-gradient(ellipse at center, transparent 55%, rgba(0, 5, 12, 0.55) 100%);
-  animation: crt-flicker 4s infinite steps(60);
-}
-
-@keyframes crt-flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.94; }
-  52% { opacity: 1; }
-  70% { opacity: 0.97; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .crt {
-    animation: none;
-  }
   html {
     scroll-behavior: auto;
   }

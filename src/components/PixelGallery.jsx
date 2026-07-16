@@ -51,10 +51,10 @@ export default function PixelGallery() {
         {pixelArt.map((it, i) => (
           <motion.figure
             key={it.id}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.5, delay: (i % 3) * 0.08 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: (i % 3) * 0.08 }}
             className="group relative mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-white/10 transition-all duration-300 hover:border-neon/40 hover:shadow-neon-sm"
           >
             <button
@@ -66,7 +66,7 @@ export default function PixelGallery() {
               <motion.div layoutId={`pixel-${it.id}`} className={it.ratio}>
                 <Media
                   item={it}
-                  className="transition-transform duration-700 ease-out group-hover:scale-110"
+                  className="transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
               </motion.div>
               {/* Caption always visible on touch, hover-reveal on desktop */}

@@ -116,7 +116,7 @@ export default function Hero() {
           >
             <a
               href="#pixel-art"
-              className="group flex items-center justify-center gap-2 rounded-lg bg-neon px-6 py-3 font-semibold text-void shadow-neon transition-transform duration-200 hover:scale-105"
+              className="group flex items-center justify-center gap-2 rounded-lg bg-neon px-6 py-3 font-semibold text-void shadow-neon transition-transform duration-200 hover:scale-[1.03]"
             >
               <ImageIcon size={18} className="transition-transform group-hover:-rotate-6" />
               View Portfolio
@@ -137,7 +137,7 @@ export default function Hero() {
             className="mt-10 flex items-center gap-3 font-pixel text-[8px] tracking-widest text-muted"
           >
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon opacity-60" />
+              <span className="absolute inline-flex h-full w-full animate-pulse rounded-full bg-neon/50 blur-[2px]" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-neon" />
             </span>
             OPEN FOR COMMISSIONS

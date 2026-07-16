@@ -24,10 +24,19 @@ export default function About() {
             ))}
           </div>
         </div>
-        {/* Portrait / avatar slot — set a src in content.js later if you like */}
+        {/* Portrait / avatar — set about.portrait.src in content.js to replace */}
         <div className="glass overflow-hidden rounded-2xl border-white/10 shadow-neon-sm">
           <div className="aspect-square">
-            <Placeholder seed={3} />
+            {about.portrait.src ? (
+              <img
+                src={about.portrait.src}
+                alt={about.portrait.alt}
+                loading="lazy"
+                className="pixelated h-full w-full object-cover"
+              />
+            ) : (
+              <Placeholder seed={about.portrait.seed} />
+            )}
           </div>
         </div>
       </div>

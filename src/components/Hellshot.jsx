@@ -25,16 +25,16 @@ export default function Hellshot() {
     <Section id="hellshot" kicker={hellshot.kicker} title={null}>
       <div className="glass overflow-hidden rounded-3xl shadow-neon-sm">
         <div className="p-5 sm:p-8 lg:p-10">
-          {/* Header */}
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          {/* Header: logo and tags share one baseline-aligned row */}
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <h3>
               <img
                 src={hellshot.logo}
                 alt={hellshot.title}
-                className="pixelated h-10 w-auto [filter:drop-shadow(0_0_10px_rgba(56,225,255,0.45))_drop-shadow(0_0_30px_rgba(56,225,255,0.2))] sm:h-14"
+                className="pixelated h-12 w-auto [filter:drop-shadow(0_0_10px_rgba(56,225,255,0.45))_drop-shadow(0_0_30px_rgba(56,225,255,0.2))] sm:h-16 lg:h-20"
               />
             </h3>
-            <div className="hidden flex-wrap gap-2 sm:flex">
+            <div className="flex flex-wrap gap-2 pb-1">
               {hellshot.tags.map((t) => (
                 <span
                   key={t}
@@ -119,17 +119,6 @@ export default function Hellshot() {
             {/* Info column */}
             <div className="flex flex-col">
               <p className="text-[17px] leading-relaxed text-muted">{hellshot.description}</p>
-
-              <div className="mt-4 flex flex-wrap gap-2 sm:hidden">
-                {hellshot.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-full border border-neon/25 bg-neon/5 px-3 py-1 text-xs font-medium text-neon"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
 
               <ul className="mt-6 space-y-3 border-t border-white/10 pt-6">
                 {hellshot.features.map((f) => {

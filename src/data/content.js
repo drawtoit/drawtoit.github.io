@@ -31,6 +31,9 @@ export const about = {
     { value: "1", label: "Game on Steam" },
     { value: "∞", label: "Pixels placed" },
   ],
+  // Tu retrato/avatar: copia el archivo a src/assets/ y cambia src, p.ej.:
+  //   src: new URL("../assets/retrato.png", import.meta.url).href,
+  portrait: { src: null, alt: "DRAWTOIT portrait", seed: 3 },
 };
 
 export const hellshot = {
@@ -78,6 +81,8 @@ export const pixelArt = [
 ];
 
 // Animation cards — point `src` at your GIFs (they render as <img>).
+// Para usar tus GIFs: copia el archivo a src/assets/ y cambia src, p.ej.:
+//   src: new URL("../assets/run-cycle.gif", import.meta.url).href,
 export const animations = [
   { id: 1, title: "Run Cycle", tag: "8 frames", src: null, seed: 101 },
   { id: 2, title: "Sword Slash", tag: "12 frames", src: null, seed: 113 },

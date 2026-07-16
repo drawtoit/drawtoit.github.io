@@ -21,7 +21,7 @@ export default function Contact() {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.4, delay: i * 0.06 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.06 }}
               whileHover={{ y: -4 }}
               className="glass flex flex-col items-center gap-3 rounded-2xl p-4 text-center transition-all duration-300 hover:border-neon/50 hover:shadow-neon-sm sm:p-6"
             >
