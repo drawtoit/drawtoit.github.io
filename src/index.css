@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+@theme {
+  --color-void: #05070d;
+  --color-panel: #0a0f1c;
+  --color-ink: #e6f4ff;
+  --color-muted: #8ba3bd;
+  --color-neon: #38e1ff;
+  --color-neon-dim: #1ba8c4;
+  --color-neon-deep: #0e5f75;
+
+  --font-pixel: "Press Start 2P", monospace;
+  --font-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-neon: 0 0 24px rgba(56, 225, 255, 0.35);
+  --shadow-neon-sm: 0 0 12px rgba(56, 225, 255, 0.25);
+}
+
+html {
+  background-color: var(--color-void);
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-void);
+  color: var(--color-ink);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--color-neon);
+  color: var(--color-void);
+}
+
+/* Thin neon scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-neon-deep);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neon-dim);
+}
+
+/* Custom cursor replaces the native one on precise pointers only */
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+/* Reusable glass panel */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Neon text glow for headings */
+.neon-text {
+  text-shadow:
+    0 0 10px rgba(56, 225, 255, 0.8),
+    0 0 40px rgba(56, 225, 255, 0.35);
+}
+
+/* Occasional RGB-split glitch for the hero title (CRT vibe) */
+.hero-glitch {
+  animation: hero-glitch 7s infinite steps(1, end);
+}
+@keyframes hero-glitch {
+  0%, 100% {
+    text-shadow:
+      0 0 10px rgba(56, 225, 255, 0.8),
+      0 0 40px rgba(56, 225, 255, 0.35);
+  }
+  81% {
+    text-shadow:
+      -3px 0 rgba(255, 45, 120, 0.9),
+      3px 0 rgba(56, 225, 255, 0.9),
+      0 0 40px rgba(56, 225, 255, 0.35);
+  }
+  82.5% {
+    text-shadow:
+      3px 0 rgba(255, 45, 120, 0.9),
+      -3px 0 rgba(56, 225, 255, 0.9),
+      0 0 40px rgba(56, 225, 255, 0.35);
+  }
+  84% {
+    text-shadow:
+      0 0 10px rgba(56, 225, 255, 0.8),
+      0 0 40px rgba(56, 225, 255, 0.35);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-glitch {
+    animation: none;
+  }
+}
+
+/* CRT overlay: scanlines + vignette + subtle flicker */
+.crt {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.18) 3px,
+      transparent 4px
+    ),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 5, 12, 0.55) 100%);
+  animation: crt-flicker 4s infinite steps(60);
+}
+
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.94; }
+  52% { opacity: 1; }
+  70% { opacity: 0.97; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Pixelated rendering for pixel art images the user drops in */
+.pixelated {
+  image-rendering: pixelated;
+}
