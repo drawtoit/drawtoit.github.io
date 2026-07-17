@@ -12,10 +12,11 @@ export const site = {
 };
 
 export const links = {
-  instagram: "https://instagram.com/YOUR_USER",
+  instagram: "https://instagram.com/drawtoit",
+  // steam = la página del juego; steamProfile = tu página personal (curator)
   steam: "https://store.steampowered.com/app/4232500/Hellshot/",
-  github: "https://github.com/drawtoit",
-  fiverr: "https://fiverr.com/YOUR_USER",
+  steamProfile: "https://store.steampowered.com/curator/45882349",
+  fiverr: "https://fiverr.com/drawtoit",
 };
 
 export const about = {
@@ -33,7 +34,11 @@ export const about = {
   ],
   // Tu retrato/avatar: copia el archivo a src/assets/ y cambia src, p.ej.:
   //   src: new URL("../assets/retrato.png", import.meta.url).href,
-  portrait: { src: null, alt: "DRAWTOIT portrait", seed: 3 },
+  portrait: {
+    src: new URL("../assets/Profile.png", import.meta.url).href,
+    alt: "DRAWTOIT portrait",
+    seed: 3,
+  },
 };
 
 export const hellshot = {
@@ -108,8 +113,7 @@ export const contact = {
     "Open for commissions, collaborations and freelance work. Pick your channel:",
   channels: [
     { icon: "Instagram", label: "Instagram", href: links.instagram },
-    { icon: "Gamepad2", label: "Steam", href: links.steam },
-    { icon: "Github", label: "GitHub", href: links.github },
+    { icon: "Gamepad2", label: "Steam", href: links.steamProfile },
     { icon: "Briefcase", label: "Fiverr", href: links.fiverr },
   ],
 };

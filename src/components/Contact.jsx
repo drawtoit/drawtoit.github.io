@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
-import { Briefcase, Gamepad2, Github, Instagram } from "lucide-react";
+import { Briefcase, Gamepad2, Instagram } from "lucide-react";
 import Section from "./Section.jsx";
 import { contact } from "../data/content.js";
 
-const ICONS = { Instagram, Gamepad2, Github, Briefcase };
+const ICONS = { Instagram, Gamepad2, Briefcase };
 
 export default function Contact() {
   return (
     <Section id="contact" kicker={contact.kicker} title={contact.title}>
       <p className="-mt-4 mb-12 max-w-xl text-[17px] leading-relaxed text-muted">{contact.blurb}</p>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
         {contact.channels.map((c, i) => {
           const Icon = ICONS[c.icon];
           return (

@@ -28,8 +28,8 @@ export default function Navbar() {
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, delay: 1.8, ease: "easeOut" }}
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled ? "glass" : "bg-transparent"
+      className={`fixed inset-x-0 top-0 z-50 border-b bg-void/95 backdrop-blur-md transition-colors duration-300 ${
+        scrolled ? "border-white/10" : "border-transparent"
       }`}
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
@@ -63,7 +63,7 @@ export default function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="glass overflow-hidden md:hidden"
+            className="overflow-hidden border-b border-white/10 bg-void/95 backdrop-blur-md md:hidden"
           >
             {LINKS.map((l) => (
               <li key={l.href}>
