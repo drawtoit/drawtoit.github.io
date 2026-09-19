@@ -177,7 +177,23 @@ export default function PixelGallery() {
                     <span className="block font-semibold text-ink">{item.title}</span>
                     <span className="mt-1 block font-pixel text-[9px] uppercase tracking-widest text-neon">
                       {item.tag}
-                      {item.credit && <span className="text-muted"> · {item.credit}</span>}
+                      {item.credit && (
+                        <span className="text-muted">
+                          {" · "}
+                          {item.creditUrl ? (
+                            <a
+                              href={item.creditUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline underline-offset-2 hover:text-neon"
+                            >
+                              {item.credit}
+                            </a>
+                          ) : (
+                            item.credit
+                          )}
+                        </span>
+                      )}
                     </span>
                   </span>
                   <span className="flex shrink-0 items-center gap-3">

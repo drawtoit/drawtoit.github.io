@@ -2,21 +2,15 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Crosshair, ExternalLink, Palette, Play, Skull, Zap } from "lucide-react";
 import Section from "./Section.jsx";
-import Placeholder from "./Placeholder.jsx";
+import { Media } from "./Placeholder.jsx";
+import Projects from "./Projects.jsx";
 import { hellshot } from "../data/content.js";
 
 const ICONS = { Crosshair, Skull, Zap, Palette };
 
-function Media({ img, className = "" }) {
-  return img.src ? (
-    <img src={img.src} alt={img.alt} loading="lazy" className={`pixelated h-full w-full object-cover ${className}`} />
-  ) : (
-    <Placeholder seed={img.seed} className={className} />
-  );
-}
-
 export default function Hellshot() {
   const [active, setActive] = useState(0);
+  const current = hellshot.media[active];
 
   return (
     <Section id="hellshot" kicker={hellshot.kicker} title={null}>
@@ -54,56 +48,43 @@ export default function Hellshot() {
                     transition={{ duration: 0.25 }}
                     className="relative h-full w-full"
                   >
-                    {active === 0 ? (
+                    {current.video ? (
                       <video
-                        src={hellshot.cover.video}
+                        src={current.video}
                         autoPlay
-                        muted
-                        loop
+                        muted={!current.controls}
+                        loop={!current.controls}
+                        controls={current.controls}
                         playsInline
-                        aria-label={hellshot.cover.alt}
-                        className="absolute bottom-0 left-0 h-[110%] w-full object-cover object-bottom"
+                        aria-label={current.alt}
+                        className="h-full w-full object-cover"
                       />
                     ) : (
-                      <Media img={hellshot.screenshots[active - 1]} />
+                      <Media img={current} />
                     )}
                   </motion.div>
                 </AnimatePresence>
               </div>
 
-              <div className="mt-3 grid grid-cols-5 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActive(0)}
-                  aria-label="Ver gameplay"
-                  className={`relative aspect-video overflow-hidden rounded-lg border transition-all duration-200 ${
-                    active === 0
-                      ? "border-neon shadow-neon-sm"
-                      : "border-white/10 opacity-60 hover:opacity-100"
-                  }`}
-                >
-                  <img
-                    src={hellshot.capsule}
-                    alt=""
-                    className="pixelated h-full w-full object-cover"
-                  />
-                  <span className="absolute inset-0 flex items-center justify-center bg-void/40 text-neon">
-                    <Play size={16} className="ml-0.5" />
-                  </span>
-                </button>
-                {hellshot.screenshots.map((s, i) => (
+              <div className="mt-3 grid grid-cols-6 gap-2">
+                {hellshot.media.map((m, i) => (
                   <button
-                    key={s.seed}
+                    key={m.seed}
                     type="button"
-                    onClick={() => setActive(i + 1)}
-                    aria-label={s.alt}
-                    className={`aspect-video overflow-hidden rounded-lg border transition-all duration-200 ${
-                      active === i + 1
+                    onClick={() => setActive(i)}
+                    aria-label={m.alt}
+                    className={`relative aspect-video overflow-hidden rounded-lg border transition-all duration-200 ${
+                      active === i
                         ? "border-neon shadow-neon-sm"
                         : "border-white/10 opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <Media img={s} />
+                    <Media img={m} />
+                    {m.video && (
+                      <span className="absolute inset-0 flex items-center justify-center bg-void/40 text-neon">
+                        <Play size={16} className="ml-0.5" />
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -142,6 +123,15 @@ export default function Hellshot() {
                   <ExternalLink size={18} />
                   View on Steam
                 </a>
+                <a
+                  href={hellshot.itchUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="glass flex items-center justify-center gap-2 rounded-lg px-6 py-3.5 font-semibold text-ink transition-all duration-200 hover:border-neon/50 hover:text-neon"
+                >
+                  <ExternalLink size={18} />
+                  View on itch.io
+                </a>
                 <p className="text-center font-pixel text-[8px] tracking-widest text-muted">
                   AVAILABLE ON STEAM
                 </p>
@@ -150,6 +140,8 @@ export default function Hellshot() {
           </div>
         </div>
       </div>
+
+      <Projects />
     </Section>
   );
 }

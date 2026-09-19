@@ -12,6 +12,14 @@ function mulberry32(seed) {
   };
 }
 
+export function Media({ img, className = "" }) {
+  return img.src ? (
+    <img src={img.src} alt={img.alt} loading="lazy" className={`pixelated h-full w-full object-cover ${className}`} />
+  ) : (
+    <Placeholder seed={img.seed} className={className} />
+  );
+}
+
 export default function Placeholder({ seed = 1, className = "" }) {
   const rand = mulberry32(seed);
   const cells = [];
