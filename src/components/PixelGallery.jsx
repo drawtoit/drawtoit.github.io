@@ -41,6 +41,25 @@ function Media({ item, className = "", muted = true, onAutoplayBlocked }) {
   );
 }
 
+function FrameSwitcher({ count, index, onChange }) {
+  const go = (d) => onChange((index + d + count) % count);
+  const arrow =
+    "absolute top-1/2 z-10 -translate-y-1/2 rounded-full border border-white/15 bg-void/60 p-2 text-ink backdrop-blur-sm transition-colors hover:border-neon/50 hover:text-neon";
+  return (
+    <>
+      <button type="button" onClick={() => go(-1)} aria-label="Sprite anterior" className={`${arrow} left-2`}>
+        <ChevronLeft size={16} />
+      </button>
+      <button type="button" onClick={() => go(1)} aria-label="Sprite siguiente" className={`${arrow} right-2`}>
+        <ChevronRight size={16} />
+      </button>
+      <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-lg bg-void/60 px-2 py-1 font-pixel text-[9px] text-neon backdrop-blur-sm">
+        {index + 1} / {count}
+      </span>
+    </>
+  );
+}
+
 function ratioParts(ratio) {
   if (ratio === "aspect-square") return [1, 1];
   if (ratio === "aspect-video") return [16, 9];
@@ -51,6 +70,17 @@ export default function PixelGallery() {
   const [filter, setFilter] = useState("All");
   const [active, setActive] = useState(null);
   const [muted, setMuted] = useState(false);
+  const [frame, setFrame] = useState({});
+
+  const withFrame = (it) => (it.frames ? { ...it, ...it.frames[frame[it.id] ?? 0] } : it);
+  const switcher = (it) =>
+    it.frames && (
+      <FrameSwitcher
+        count={it.frames.length}
+        index={frame[it.id] ?? 0}
+        onChange={(n) => setFrame((f) => ({ ...f, [it.id]: n }))}
+      />
+    );
 
   const shown = filter === "All" ? pixelArt : pixelArt.filter((it) => it.category === filter);
   const item = active !== null ? shown[active] : null;
@@ -115,7 +145,7 @@ export default function PixelGallery() {
             >
               <motion.div layoutId={`pixel-${it.id}`} className={it.ratio}>
                 <Media
-                  item={it}
+                  item={withFrame(it)}
                   className="transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
               </motion.div>
@@ -131,6 +161,7 @@ export default function PixelGallery() {
                 <Maximize2 size={14} />
               </span>
             </button>
+            {switcher(it)}
           </motion.figure>
         ))}
       </div>
@@ -155,7 +186,7 @@ export default function PixelGallery() {
             <figure className="relative z-10 flex max-h-full flex-col items-center gap-4 overflow-y-auto">
               <motion.div
                 layoutId={`pixel-${item.id}`}
-                className="shrink-0 overflow-hidden rounded-2xl border border-neon/30 shadow-neon"
+                className="relative shrink-0 overflow-hidden rounded-2xl border border-neon/30 shadow-neon"
                 style={(() => {
                   const [w, h] = ratioParts(item.ratio);
                   return {
@@ -165,10 +196,11 @@ export default function PixelGallery() {
                 })()}
               >
                 <Media
-                  item={item}
+                  item={withFrame(item)}
                   muted={muted}
                   onAutoplayBlocked={() => setMuted(true)}
                 />
+                {switcher(item)}
               </motion.div>
 
               <figcaption className="w-full max-w-2xl px-1 pb-2">

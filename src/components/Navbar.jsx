@@ -4,7 +4,7 @@ import { Menu, X } from "lucide-react";
 import { site } from "../data/content.js";
 
 const LINKS = [
-  { href: "#hellshot", label: "Hellshot" },
+  { href: "#hellshot", label: "Games" },
   { href: "#pixel-art", label: "Pixel Art" },
   { href: "#about", label: "About" },
   { href: "#skills", label: "Skills" },

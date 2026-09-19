@@ -15,13 +15,12 @@ export const about = {
   kicker: "About me",
   title: "Crafting worlds, one pixel at a time",
   paragraphs: [
-    "I'm a pixel artist and indie game developer passionate about turning tiny squares into living worlds. From character sprites to full environments, I focus on readable silhouettes, bold palettes and animation that feels alive.",
+    "I'm a pixel artist and game dev, and making art for video games is what I enjoy most. I mostly draw characters, animations and environments, and along the way I've made a few games of my own for game jams.",
     "I shipped Hellshot on Steam and made all the art for it: character sprites, environments, animation and VFX. I'm open to studio roles, collaborations and freelance projects.",
   ],
   stats: [
     { value: "5+", label: "Years of pixel art" },
     { value: "1", label: "Game on Steam" },
-    { value: "∞", label: "Pixels placed" },
   ],
   portrait: {
     src: new URL("../assets/Profile.png", import.meta.url).href,
@@ -190,16 +189,41 @@ export const pixelArt = [
     src: null,
     seed: 200,
   },
-  { id: 1, title: "Neon Alley", tag: "Environment", category: "Illustration", ratio: "aspect-[3/4]", src: null, seed: 11 },
-  { id: 3, title: "Deep Cavern", tag: "Environment", category: "Illustration", ratio: "aspect-[4/3]", src: null, seed: 37 },
-  { id: 5, title: "Skyline Ruins", tag: "Environment", category: "Illustration", ratio: "aspect-[4/5]", src: null, seed: 53 },
-  { id: 6, title: "Item Set Vol.1", tag: "Props", category: "Illustration", ratio: "aspect-square", src: null, seed: 67 },
-  { id: 7, title: "The Last Train", tag: "Scene", category: "Illustration", ratio: "aspect-[4/3]", src: null, seed: 71 },
-  { id: 9, title: "Forest Tileset", tag: "Tileset", category: "Illustration", ratio: "aspect-[4/3]", src: null, seed: 97 },
+  {
+    id: 22,
+    title: "Ashley",
+    tag: "Character",
+    category: "Illustration",
+    ratio: "aspect-square",
+    src: new URL("../assets/Ashley.gif", import.meta.url).href,
+    seed: 220,
+  },
 
-  { id: 2, title: "Bounty Hunter", tag: "Character", category: "Character Art", ratio: "aspect-square", src: null, seed: 23 },
-  { id: 4, title: "Mech Unit 07", tag: "Character", category: "Character Art", ratio: "aspect-[3/4]", src: null, seed: 41 },
-  { id: 8, title: "Boss: Cinder King", tag: "Boss", category: "Character Art", ratio: "aspect-[3/4]", src: null, seed: 83 },
+  {
+    id: 24,
+    title: "Character Portraits",
+    tag: "Portraits",
+    category: "Character Art",
+    ratio: "aspect-square",
+    frames: [
+      { title: "The Butcher", src: new URL("../assets/PortraitButcher.png", import.meta.url).href },
+      { title: "Donald", src: new URL("../assets/PortraitDonald.png", import.meta.url).href },
+      { title: "Saria", src: new URL("../assets/PortraitSaria.png", import.meta.url).href },
+    ],
+    seed: 240,
+  },
+  {
+    id: 25,
+    title: "Kass",
+    tag: "Sprite",
+    category: "Character Art",
+    ratio: "aspect-square",
+    frames: [
+      { title: "Kass sprite sheet", src: new URL("../assets/KassSheet.png", import.meta.url).href },
+      { title: "Kass animation", src: new URL("../assets/KassAnim.gif", import.meta.url).href },
+    ],
+    seed: 250,
+  },
 
   {
     id: 16,
@@ -209,6 +233,7 @@ export const pixelArt = [
     ratio: "aspect-[4/5]",
     video: new URL("../assets/AtomicPixelParty.mp4", import.meta.url).href,
     credit: "Client · Atomic Pixel Party",
+    creditUrl: "https://atomicpixel.es/",
     description:
       `I made this poster for the company Atomic Pixel Party, for their "In the Arcade World" season. Hand-drawn in Aseprite and animated in After Effects (the VFX come from there too). The aesthetic leans into arcade fighting games. I looked at franchises like Scott Pilgrim and Street Fighter for the different elements of the composition.`,
     src: null,
@@ -227,12 +252,22 @@ export const pixelArt = [
     src: null,
     seed: 210,
   },
-  { id: 10, title: "Run Cycle", tag: "8 frames", category: "Animation", ratio: "aspect-video", src: null, seed: 101 },
-  { id: 11, title: "Sword Slash", tag: "12 frames", category: "Animation", ratio: "aspect-square", src: null, seed: 113 },
-  { id: 12, title: "Idle Breathing", tag: "6 frames", category: "Animation", ratio: "aspect-video", src: null, seed: 127 },
-  { id: 13, title: "Explosion FX", tag: "14 frames", category: "Animation", ratio: "aspect-square", src: null, seed: 131 },
-  { id: 14, title: "Water Shader", tag: "Loop", category: "Animation", ratio: "aspect-video", src: null, seed: 139 },
-  { id: 15, title: "Boss Intro", tag: "24 frames", category: "Animation", ratio: "aspect-[4/3]", src: null, seed: 149 },
+  {
+    id: 23,
+    title: "HispaniaCraft Mobs",
+    tag: "Sprites",
+    category: "Animation",
+    ratio: "aspect-square",
+    credit: "Client · HispaniaCraft",
+    creditUrl: "https://hispaniacraft.tebex.io/",
+    frames: [
+      { title: "Villager", src: new URL("../assets/HispaniaCraftVillager.gif", import.meta.url).href },
+      { title: "Copper Golem", src: new URL("../assets/HispaniaCraftCopperGolem.gif", import.meta.url).href },
+      { title: "Spider", src: new URL("../assets/HispaniaCraftSpider.gif", import.meta.url).href },
+      { title: "Villager King", src: new URL("../assets/HispaniaCraftKing.gif", import.meta.url).href },
+    ],
+    seed: 230,
+  },
 ];
 
 export const skills = [
