@@ -16,7 +16,7 @@ export const about = {
   title: "Crafting worlds, one pixel at a time",
   paragraphs: [
     "I'm a pixel artist and game dev, and making art for video games is what I enjoy most. I mostly draw characters, animations and environments, and along the way I've made a few games of my own for game jams.",
-    "I shipped Hellshot on Steam and made all the art for it: character sprites, environments, animation and VFX. I'm open to studio roles, collaborations and freelance projects.",
+    "I've made art for indie games, school projects and client commissions, from sprites and UI to animation, VFX and key art. I'm open to studio roles, collaborations and freelance projects.",
   ],
   stats: [
     { value: "5+", label: "Years of pixel art" },
