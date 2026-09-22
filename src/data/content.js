@@ -103,7 +103,7 @@ export const projects = [
     title: "Katabra",
     tags: ["School project"],
     description:
-      "School project where I was the art director and handled the visual side: key art, sprites and UI, all hand-made pixel art.",
+      "School project where I was project director and art director: key art, sprites and UI in a cartoon style mixed with pixel art.",
     itchUrl: "https://drawtoit.itch.io/katabra",
     media: [
       { src: new URL("../assets/PortadaKatabra.png", import.meta.url).href, alt: "Katabra key art", seed: 19 },
@@ -235,6 +235,18 @@ export const pixelArt = [
       { title: "Kass animation", src: new URL("../assets/KassAnim.gif", import.meta.url).href },
     ],
     seed: 250,
+  },
+  {
+    id: 27,
+    title: "Goblin",
+    description:
+      "Example of animation applied to a sprite: a goblin gets turned into a chicken. Squash and stretch plus a puff of smoke sell the transformation.",
+    tag: "Sprite",
+    category: "Personal Work",
+    ratio: "aspect-square",
+    video: new URL("../assets/GoblinAnimation.mp4", import.meta.url).href,
+    src: null,
+    seed: 270,
   },
 
   {
