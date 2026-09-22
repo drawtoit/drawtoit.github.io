@@ -78,7 +78,7 @@ export default function Hero() {
           variants={container}
           initial="hidden"
           animate="show"
-          className="flex max-w-xl flex-col items-start text-left"
+          className="mx-auto flex max-w-xl flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left"
         >
           <motion.p
             variants={item}

@@ -140,19 +140,19 @@ export const projects = [
   },
 ];
 
-export const pixelArtCategories = ["Illustration", "Character Art", "Animation"];
+export const pixelArtCategories = ["Commissions", "Personal Work"];
 
 export const pixelArt = [
   {
     id: 17,
     title: "Gothic Church",
     tag: "Environment",
-    category: "Illustration",
+    category: "Personal Work",
     ratio: "aspect-square",
     video: new URL("../assets/Iglesia.mp4", import.meta.url).href,
     sound: true,
     description:
-      "Illustration of a church inspired by 13th-century Gothic architecture, reimagined within a dark, fantastical setting. Rain, drifting fog, and a single flash of lightning build the atmosphere of the scene. I wanted to explore how these effects could convey tenebrosity without showing anything explicitly.",
+      "Personal piece, my own setting. Illustration of a church inspired by 13th-century Gothic architecture, reimagined within a dark, fantastical setting. Rain, drifting fog, and a single flash of lightning build the atmosphere of the scene. I wanted to explore how these effects could convey tenebrosity without showing anything explicitly.",
     src: null,
     seed: 170,
   },
@@ -160,18 +160,22 @@ export const pixelArt = [
     id: 18,
     title: "Ignis",
     tag: "Creature",
-    category: "Illustration",
+    category: "Personal Work",
     ratio: "aspect-square",
     video: new URL("../assets/Ignis.mp4", import.meta.url).href,
     sound: true,
+    description:
+      "Original creature design of mine. A beast built around fire, so the silhouette, the palette and the animation all push heat and movement.",
     src: null,
     seed: 180,
   },
   {
     id: 19,
     title: "Maki",
+    description:
+      "Fan art of Maki Zenin from Jujutsu Kaisen, after the events that leave her scarred. I went for a cold, washed-out palette so the only warmth left is in her expression.",
     tag: "Character",
-    category: "Illustration",
+    category: "Personal Work",
     ratio: "aspect-square",
     video: new URL("../assets/Maki.mp4", import.meta.url).href,
     sound: true,
@@ -181,8 +185,10 @@ export const pixelArt = [
   {
     id: 20,
     title: "Sailor",
+    description:
+      "Fan art of Sailor Moon reimagined as an armored knight. Drawn with a single pink duotone palette to keep the original color identity while the design goes somewhere heavier.",
     tag: "Character",
-    category: "Illustration",
+    category: "Personal Work",
     ratio: "aspect-[2/3]",
     video: new URL("../assets/Sailor.mp4", import.meta.url).href,
     sound: true,
@@ -192,8 +198,10 @@ export const pixelArt = [
   {
     id: 22,
     title: "Ashley",
+    description:
+      "Fan art of Ashley from WarioWare, summoning her demon Red in the middle of a ritual. Animated loop with candlelight and a glowing pentagram.",
     tag: "Character",
-    category: "Illustration",
+    category: "Personal Work",
     ratio: "aspect-square",
     src: new URL("../assets/Ashley.gif", import.meta.url).href,
     seed: 220,
@@ -202,8 +210,10 @@ export const pixelArt = [
   {
     id: 24,
     title: "Character Portraits",
+    description:
+      "Portrait studies of characters I like: Donald Duck in his Kingdom Hearts mage outfit, Saria from The Legend of Zelda: Ocarina of Time, and The Butcher. Each one gets its own palette and lighting to match the tone of the character.",
     tag: "Portraits",
-    category: "Character Art",
+    category: "Personal Work",
     ratio: "aspect-square",
     frames: [
       { title: "The Butcher", src: new URL("../assets/PortraitButcher.png", import.meta.url).href },
@@ -215,8 +225,10 @@ export const pixelArt = [
   {
     id: 25,
     title: "Kass",
+    description:
+      "Fan art of Kass from The Legend of Zelda: Breath of the Wild, sprite sheet and idle animation with his accordion, with Hyrule Castle on the horizon.",
     tag: "Sprite",
-    category: "Character Art",
+    category: "Personal Work",
     ratio: "aspect-square",
     frames: [
       { title: "Kass sprite sheet", src: new URL("../assets/KassSheet.png", import.meta.url).href },
@@ -229,7 +241,7 @@ export const pixelArt = [
     id: 16,
     title: "Atomic Pixel Party",
     tag: "Poster",
-    category: "Animation",
+    category: "Commissions",
     ratio: "aspect-[4/5]",
     video: new URL("../assets/AtomicPixelParty.mp4", import.meta.url).href,
     credit: "Client · Atomic Pixel Party",
@@ -243,7 +255,7 @@ export const pixelArt = [
     id: 21,
     title: "PsychoKalaka Outro",
     tag: "Outro",
-    category: "Animation",
+    category: "Commissions",
     ratio: "aspect-video",
     video: new URL("../assets/OutroPsychoKalaka.mp4", import.meta.url).href,
     credit: "Client · PsychoKalaka",
@@ -255,8 +267,10 @@ export const pixelArt = [
   {
     id: 23,
     title: "HispaniaCraft Mobs",
+    description:
+      "Animated mob sprites commissioned for the website of HispaniaCraft, a Minecraft server. Each mob is a pixel art take on the in-game model, looping so they can sit anywhere on the page.",
     tag: "Sprites",
-    category: "Animation",
+    category: "Commissions",
     ratio: "aspect-square",
     credit: "Client · HispaniaCraft",
     creditUrl: "https://hispaniacraft.tebex.io/",
@@ -267,6 +281,22 @@ export const pixelArt = [
       { title: "Villager King", src: new URL("../assets/HispaniaCraftKing.gif", import.meta.url).href },
     ],
     seed: 230,
+  },
+  {
+    id: 26,
+    title: "Orce Album Cover",
+    tag: "Album Cover",
+    category: "Commissions",
+    ratio: "aspect-square",
+    credit: "Client · Orce",
+    creditUrl: "https://www.tiktok.com/@orce_ey",
+    description:
+      "Animated album cover made for Orce, an Argentine singer and influencer. Two versions of the same artwork, drawn in Aseprite and animated for the release on streaming platforms and social media.",
+    frames: [
+      { title: "Version 1", video: new URL("../assets/OrceAlbum1.mp4", import.meta.url).href },
+      { title: "Version 2", video: new URL("../assets/OrceAlbum2.mp4", import.meta.url).href },
+    ],
+    seed: 260,
   },
 ];
 
