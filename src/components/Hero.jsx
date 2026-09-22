@@ -3,6 +3,8 @@ import { ImageIcon, Mail } from "lucide-react";
 import StarField from "./StarField.jsx";
 import { site, links } from "../data/content.js";
 import heroGif from "../assets/GifPrincipio.webp";
+import circleRing from "../assets/Circulomenu2.png";
+import circleEye from "../assets/Circulomenu.png";
 
 const container = {
   hidden: {},
@@ -89,8 +91,26 @@ export default function Hero() {
           <motion.h1
             variants={letters}
             aria-label={site.name}
-            className="hero-glitch font-pixel text-3xl leading-relaxed text-ink neon-text sm:text-5xl md:text-6xl"
+            className="hero-glitch relative font-pixel text-3xl leading-relaxed text-ink neon-text sm:text-5xl md:text-6xl"
           >
+            <motion.img
+              src={circleRing}
+              alt=""
+              aria-hidden="true"
+              style={{ x: "-50%", y: "-50%" }}
+              animate={reduce ? {} : { rotate: 360 }}
+              transition={{ duration: 65, repeat: Infinity, ease: "linear" }}
+              className="pixelated pointer-events-none absolute left-1/2 top-1/2 h-[7em] w-[7em] max-w-none opacity-[0.14]"
+            />
+            <motion.img
+              src={circleEye}
+              alt=""
+              aria-hidden="true"
+              style={{ x: "-50%", y: "-50%" }}
+              animate={reduce ? {} : { rotate: -360 }}
+              transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
+              className="pixelated pointer-events-none absolute left-1/2 top-1/2 h-[7.6em] w-[7.6em] max-w-none opacity-[0.18]"
+            />
             {site.name.split("").map((ch, i) => (
               <motion.span key={i} variants={letter} aria-hidden="true" className="inline-block">
                 {ch}
@@ -107,7 +127,7 @@ export default function Hero() {
             className="mt-10 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
           >
             <a
-              href="#pixel-art"
+              href="#hellshot"
               className="group flex items-center justify-center gap-2 rounded-lg bg-neon px-6 py-3 font-semibold text-void shadow-neon transition-transform duration-200 hover:scale-[1.03]"
             >
               <ImageIcon size={18} className="transition-transform group-hover:-rotate-6" />
@@ -136,8 +156,8 @@ export default function Hero() {
       </div>
 
       <motion.a
-        href="#about"
-        aria-label="Scroll to About"
+        href="#hellshot"
+        aria-label="Scroll to Games"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 3 }}
