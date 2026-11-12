@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pixel CRT &amp; Normals | DRAWTOIT</title>
+<meta name="description" content="Free browser tool for pixel art: CRT effect for images, GIFs and videos, and normal map generation with live lighting preview. By DRAWTOIT.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Paleta y fuentes de drawtoit.com (src/index.css) */
+  :root { --void: #05070d; --panel: #0a0f1c; --ink: #e6f4ff; --muted: #8ba3bd; --neon: #38e1ff; --line: rgba(255, 255, 255, .1); }
+  body { margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--void); color: var(--muted); font: 13px "Space Grotesk", system-ui, sans-serif; }
+  .site { display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .site a { text-decoration: none; }
+  .site .brand { font: 12px "Press Start 2P", monospace; color: var(--neon); text-shadow: 0 0 10px rgba(56, 225, 255, .8), 0 0 40px rgba(56, 225, 255, .35); }
+  .site h1 { margin: 0; font: 500 14px "Space Grotesk", system-ui, sans-serif; color: var(--ink); }
+  /* Mismos enlaces que el menú de la web (src/components/Navbar.jsx); al salir de /tools vuelven a la portada */
+  .site nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+  .site nav a { font-size: 14px; color: var(--muted); transition: color .2s; }
+  .site nav a:hover, .site nav a[aria-current] { color: var(--neon); }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  main { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }
+  canvas { max-width: 100%; max-height: 100%; }
+  #nrm { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+  /* .crt se ve en CRT y Mezcla; .nrm en Normales y Mezcla; .only-nrm solo en Normales */
+  body[data-mode=crt] .nrm, body[data-mode=nrm] .crt, body:not([data-mode=nrm]) .only-nrm { display: none !important; }
+  .tools { display: contents; }
+  button, select, .btn { background: rgba(255, 255, 255, .05); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 6px 10px; font: inherit; cursor: pointer; }
+  button:hover, .btn:hover { border-color: var(--neon); color: var(--neon); }
+  button[aria-pressed=true] { background: var(--neon); border-color: var(--neon); color: var(--void); }
+  button:disabled { opacity: .5; }
+  select option { background: var(--panel); }
+  .group { display: flex; }
+  .group button { border-radius: 0; margin-left: -1px; }
+  .group button:first-child { border-radius: 4px 0 0 4px; }
+  .group button:last-child { border-radius: 0 4px 4px 0; }
+  label { display: flex; align-items: center; gap: 6px; }
+  input[type=range] { width: 90px; accent-color: var(--neon); }
+  input[type=checkbox] { accent-color: var(--neon); }
+  input[type=file], video { position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none; } /* el vídeo va en el DOM para que el navegador siga decodificando */
+  .spacer { flex: 1; }
+</style>
+</head>
+<body data-mode="crt">
+<div class="site">
+  <a class="brand" href="/">DRAWTOIT</a>
+  <h1>Pixel CRT &amp; Normals</h1>
+  <nav>
+    <a href="/#hellshot">Games</a>
+    <a href="/#pixel-art">Pixel Art</a>
+    <a href="/tools/index.html" aria-current="page">Tools</a>
+    <a href="/#about">About</a>
+    <a href="/#skills">Skills</a>
+    <a href="/#contact">Contact</a>
+  </nav>
+</div>
+<header>
+  <label class="btn">Open<input type="file" id="file" accept="image/*,video/*"></label>
+  <div class="group" id="modes">
+    <button data-mode="crt" aria-pressed="true">CRT</button><button data-mode="nrm">Normals</button><button data-mode="mix">CRT + Normals</button>
+  </div>
+  <div class="group" id="shows">
+    <button data-show="both" aria-pressed="true">Compare</button><button data-show="one">Result</button><button data-show="map" class="only-nrm">Normal map</button>
+  </div>
+  <span class="tools crt">
+  <label>Signal
+    <select id="lines">
+      <option value="0">Native</option><option value="240">240p</option><option value="480">480p</option>
+    </select>
+  </label>
+  <span id="sliders" class="tools"></span>
+  </span>
+  <span class="tools nrm">
+    <label>Type
+      <select id="ntype">
+        <option value="character">Character</option><option value="object" selected>Object</option><option value="terrain">Terrain</option>
+      </select>
+    </label>
+    <span id="nsliders" class="tools"></span>
+    <label><input type="checkbox" id="merge" checked>Merge outlines</label>
+  </span>
+  <span class="spacer"></span>
+  <span id="err" style="color:#f66"></span>
+  <button id="full">Fullscreen</button>
+  <button id="save">Download PNG</button>
+</header>
+<main><canvas id="out" class="crt"></canvas><canvas id="nrm" class="only-nrm"></canvas></main>
+<script>
+// Visor CRT en WebGL2, dos pasadas en GPU:
+//   1. CRT: señal a N líneas -> haz con scanlines (más gordo cuanto más brillo) -> slot mask RGB (de Ware/CRT)
+//   2. Post: 3 glows (mipmaps de la pasada 1) + curva, y vistas Raw / CRT / Split
+const SLIDERS = [ // contenedor, id, etiqueta, min, max, paso, valor
+  ['sliders', 'dotSize', 'Dot', 1, 8, .25, 2],
+  ['sliders', 'bright', 'Brightness', 0, 2, .01, 1],
+  ['sliders', 'glowI', 'Glow', 0, 1, .01, .15],
+  ['nsliders', 'nstr', 'Strength', 0, 2, .05, 1],     // inclinación de los planos
+  ['nsliders', 'edge', 'Edge width', 0, 8, 1, 3],        // pasadas de suavizado del relieve: más = bordes más anchos
+  ['nsliders', 'facets', 'Facets', 0, 100, 1, 35],   // facilidad para partir manchas grandes en caras; 0 = nunca
+  ['nsliders', 'lz', 'Light height', .02, .5, .01, .12], // en proporción al tamaño del sprite
+  ['nsliders', 'lr', 'Light range', .1, 1.5, .01, .35],
+];
+// ponytail: valores fijos (los de Ware); devolver uno a SLIDERS lo convierte en control
+const FIXED = { slotH: 3, gap: .4, soft: .3, curve: 1.05 }; // soft incluye el desenfoque de la máscara (antes un blur 3x3 aparte, 9 veces más caro)
+const GAIN = 5;        // compensa lo que oscurecen máscara y scanlines con Brillo = 1
+const MAX_SIDE = 1920; // tope de salida por lado; más grande va lento en gráficas integradas
+
+const $ = id => document.getElementById(id);
+addEventListener('error', e => $('err').textContent = 'Error: ' + e.message); // que un fallo no pase en silencio
+let dirty = true, show = 'both'; // show: 'both' = comparación, 'one' = solo el resultado, 'map' = solo el mapa (Normales) // dirty = hay que volver a dibujar (las imágenes fijas no se redibujan cada frame)
+const mode = () => document.body.dataset.mode;
+let needN = true; // hay que recalcular las normales (no solo mover la luz)
+const changed = () => dirty = needN = true; // el trabajo se hace en frame(), como mucho una vez por fotograma
+const inputs = {};
+for (const [parent, id, text, min, max, step, value] of SLIDERS) {
+  const l = document.createElement('label'), i = document.createElement('input');
+  Object.assign(i, { type: 'range', min, max, step, value });
+  i.oninput = changed;
+  l.append(text, i);
+  $(parent).append(l);
+  inputs[id] = i;
+}
+const v = id => inputs[id] ? +inputs[id].value : FIXED[id];
+$('lines').onchange = $('merge').onchange = changed;
+$('ntype').onchange = () => { inputs.facets.value = PRESETS[$('ntype').value].facets; changed(); };
+function group(id, key, pick) { // botones excluyentes
+  $(id).onclick = e => {
+    if (!e.target.dataset[key]) return;
+    for (const b of $(id).children) b.setAttribute('aria-pressed', b === e.target);
+    pick(e.target.dataset[key]);
+  };
+}
+group('shows', 'show', x => { show = x; changed(); });
+group('modes', 'mode', x => {
+  document.body.dataset.mode = x;
+  if (x !== 'nrm' && show === 'map') $('shows').children[1].click(); // "Normal map" solo existe en Normales
+  changed(); label();
+});
+$('full').onclick = () => document.querySelector('main').requestFullscreen();
+
+const VERT = `#version 300 es
+void main() { gl_Position = vec4(vec2(gl_VertexID % 2, gl_VertexID / 2) * 4. - 1., 0, 1); }`; // triángulo a pantalla completa, sin buffers
+
+const FRAG_CRT = `#version 300 es
+precision highp float;
+uniform sampler2D src;
+uniform vec2 res, vres, srcSize; // salida, señal (líneas del CRT) y archivo, en px
+uniform vec2 crtX;                // (escala, desplazamiento) en X de la zona de la textura que entra al CRT
+uniform float dotSize, slotH, gap, soft, bright;
+out vec4 o;
+
+vec3 matte(vec2 px) {
+  // Columnas R|G|B; cada tríada impar baja medio slot
+  vec2 cell = px / (dotSize * vec2(1., slotH));
+  int column = int(cell.x);
+  cell.y += float((column / 3) % 2) * .5;
+  int ch = column % 3;
+  vec2 p = (fract(cell) - .5) * vec2(1., slotH); // local, en anchos de columna
+
+  // Cápsula vertical con el mismo hueco en horizontal y vertical
+  float r = (1. - gap) * .5;
+  float seg = max(slotH * .5 - gap * .5 - r, 0.);
+  float d = length(vec2(p.x, max(abs(p.y) - seg, 0.))) - r;
+  return (1. - smoothstep(-soft, soft, d)) * vec3(ch == 0, ch == 1, ch == 2);
+}
+
+void main() {
+  vec2 px = vec2(gl_FragCoord.x, res.y - gl_FragCoord.y);
+  vec2 s = px / res * vres; // posición en píxeles de señal
+
+  // Haz: cada línea de señal se lee en su centro (sin mezclar líneas) y se suaviza solo en horizontal
+  float y0 = floor(s.y) + .5, dy = s.y - y0, xs = s.x - .5;
+  float x = floor(xs) + .5 + smoothstep(0., 1., fract(xs));
+  float lod = max(log2(srcSize.y / vres.y), 0.); // si la señal tiene menos líneas que el archivo, promedia
+  vec3 col = pow(textureLod(src, vec2(clamp(x, .5, vres.x - .5) / vres.x * crtX.x + crtX.y, y0 / vres.y), lod).rgb, vec3(2.2)); // a luz lineal: los fósforos suman luz, no valores
+
+  // Scanline: perfil gaussiano por canal, más ancho cuanto más brilla
+  vec3 sig = mix(vec3(.2), vec3(.42), col);
+  vec3 scan = exp(-dy * dy / (2. * sig * sig));
+
+  // Saturación suave (1 - e^-x) en vez de recorte: los colores claros no se queman a blanco
+  o = vec4(1. - exp(-col * scan * matte(px) * bright), 1);
+}`;
+
+const FRAG_POST = `#version 300 es
+precision highp float;
+uniform sampler2D crt, src;
+uniform vec2 res, crtRes, srcSize, rawX; // canvas, pasada CRT y sprite, en px; rawX = zona de la textura con el albedo
+uniform float glowR, glowI, curve;
+uniform int compare; // 1 = albedo a la izquierda y CRT a la derecha
+out vec4 o;
+
+// ponytail: glow con mipmaps (4 muestras por nivel) en vez de blur gaussiano real; si se ve
+// cuadriculado con glows muy fuertes, cambiar por blur separable en dos pasadas.
+vec3 glow(vec2 uv, float radius) {
+  float lod = log2(radius * 2.);
+  vec2 t = exp2(lod) * .5 / crtRes;
+  return (textureLod(crt, uv + t, lod).rgb + textureLod(crt, uv - t, lod).rgb
+        + textureLod(crt, uv + vec2(t.x, -t.y), lod).rgb + textureLod(crt, uv + vec2(-t.x, t.y), lod).rgb) / 4.;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / res;
+  if (compare == 1) {
+    if (uv.x < .5) { // albedo: píxel exacto del archivo, sin filtrar
+      vec2 p = (floor(vec2(uv.x * 2., 1. - uv.y) * srcSize) + .5) / srcSize;
+      o = vec4(textureLod(src, vec2(p.x * rawX.x + rawX.y, p.y), 0.).rgb, 1);
+      return;
+    }
+    uv.x = uv.x * 2. - 1.;
+  }
+  vec3 c = texture(crt, uv).rgb + glowI * (glow(uv, glowR) + glow(uv, glowR * 3.) + glow(uv, glowR * 9.)); // corto, medio y largo
+  c = pow(c, vec3(1. / 2.2)); // de luz lineal a pantalla
+  o = vec4((c - .5) * curve + .5, 1); // curva: contraste sutil
+}`;
+
+const out = $('out');
+const gl = out.getContext('webgl2');
+if (!gl) document.querySelector('main').textContent = 'Your browser does not support WebGL2.';
+
+function program(frag) {
+  const p = gl.createProgram();
+  for (const [type, code] of [[gl.VERTEX_SHADER, VERT], [gl.FRAGMENT_SHADER, frag]]) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, code); gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
+    gl.attachShader(p, sh);
+  }
+  gl.linkProgram(p);
+  return p;
+}
+function texture(unit) {
+  const t = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0 + unit);
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return t;
+}
+const crtProg = program(FRAG_CRT), postProg = program(FRAG_POST);
+texture(0);                 // unidad 0: archivo
+const crtTex = texture(1);  // unidad 1: resultado de la pasada CRT
+const fbo = gl.createFramebuffer();
+let fboSize = '';
+gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true); // transparente = negro
+const uniforms = (prog, values) => {
+  for (const [name, val] of Object.entries(values)) {
+    const loc = gl.getUniformLocation(prog, name);
+    if (Array.isArray(val)) gl.uniform2f(loc, ...val);
+    else if (name === 'compare' || name === 'src' || name === 'crt') gl.uniform1i(loc, val);
+    else gl.uniform1f(loc, val);
+  }
+};
+
+// Fuente por defecto: carta de ajuste, para ver algo antes de subir nada
+let source = document.createElement('canvas'), upload = true;
+let anim = null; // GIF animado: { frames: [{ bmp, dur }], total, t0 } (ms)
+source.width = 160; source.height = 90;
+{
+  const c = source.getContext('2d');
+  ['#fff', '#ff0', '#0ff', '#0f0', '#f0f', '#f00', '#00f', '#000'].forEach((col, i) => { c.fillStyle = col; c.fillRect(i * 20, 0, 20, 90); });
+  c.fillStyle = '#000'; c.fillRect(0, 60, 160, 30);
+  c.fillStyle = '#fff'; c.font = '10px monospace'; c.fillText('Open or drop a file', 22, 79);
+}
+
+const isVideo = () => source.tagName === 'VIDEO';
+const size = () => [source.videoWidth || source.width, source.videoHeight || source.height];
+const animated = () => isVideo() || anim;
+const label = () => $('save').textContent = mode() === 'nrm' ? 'Download normal map' : animated() ? 'Download video' : 'Download PNG';
+
+async function load(file) {
+  if (!file) return;
+  let next, nextAnim = null;
+  try {
+    if (file.type === 'image/gif' && window.ImageDecoder) { // decodificador nativo; sin él (navegador antiguo) el GIF queda fijo
+      const dec = new ImageDecoder({ data: await file.arrayBuffer(), type: file.type });
+      await dec.tracks.ready; await dec.completed;
+      const frames = [];
+      for (let i = 0; i < dec.tracks.selectedTrack.frameCount; i++) {
+        const { image } = await dec.decode({ frameIndex: i });
+        frames.push({ bmp: await createImageBitmap(image), dur: Math.max(image.duration / 1000 || 100, 20) });
+        image.close();
+      }
+      next = frames[0].bmp;
+      if (frames.length > 1) nextAnim = { frames, total: frames.reduce((a, f) => a + f.dur, 0), t0: performance.now() };
+    }
+    else if (file.type.startsWith('image/')) next = await createImageBitmap(file);
+    else {
+      next = document.createElement('video');
+      Object.assign(next, { src: URL.createObjectURL(file), loop: true, muted: true, playsInline: true });
+      document.body.append(next);
+      await next.play();
+      if (!next.videoWidth) throw new Error('no decodable video track');
+    }
+  } catch (e) {
+    if (next?.remove) next.remove();
+    return alert('This browser cannot open that file (' + e.message + ').\nFor video use MP4 (H.264) or WebM; ProRes/HEVC/.mov exports usually do not play in browsers.');
+  }
+  if (isVideo()) { source.pause(); source.remove(); }
+  source = next; anim = nextAnim;
+  $('lines').value = size()[1] <= 300 ? 0 : 240; // pixel art: sus propias líneas; material grande: 240p
+  upload = true;
+  changed(); label();
+}
+$('file').onchange = e => load(e.target.files[0]);
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => { e.preventDefault(); load(e.dataTransfer.files[0]); });
+
+function frame(t) { requestAnimationFrame(frame); render(t); }
+function render(t) {
+  if (mode() === 'nrm') { // Normales: recalcular o solo mover la luz, una vez por fotograma como mucho
+    if (needN) normals(); else if (dirty) light();
+    dirty = needN = false;
+    return;
+  }
+  const mix = mode() === 'mix';
+  if (anim) { // fotograma del GIF que toca ahora
+    let left = (t - anim.t0) % anim.total;
+    const f = anim.frames.find(f => (left -= f.dur) < 0) || anim.frames[0];
+    if (f.bmp !== source) { source = f.bmp; upload = dirty = needN = true; }
+  }
+  if (!dirty && !isVideo()) return;
+  dirty = false;
+  const [sw, sh] = size();
+  // Señal: nº de líneas del CRT. Salida: múltiplo entero de la señal, ~1080 px de alto
+  const vh = Math.min(+$('lines').value || sh, sh), vw = Math.round(sw * vh / sh);
+  const sc = Math.max(1, Math.min(16, Math.max(3, Math.floor(1080 / vh)), Math.floor(MAX_SIDE / Math.max(vw, vh))));
+  const w = vw * sc, h = vh * sc;
+  const cmp = show === 'both', cw = cmp ? 2 * w : w; // en comparación, el canvas mide dos paneles
+  if (out.width !== cw || out.height !== h) { out.width = cw; out.height = h; }
+  if (fboSize !== w + 'x' + h) {
+    fboSize = w + 'x' + h;
+    gl.activeTexture(gl.TEXTURE1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, crtTex, 0);
+  }
+
+  // Pasada 1: CRT -> textura
+  // En Mezcla, la textura es el canvas de light(): albedo a la izquierda y sprite iluminado (lo que entra al CRT) a la derecha
+  if (mix) { needN || isVideo() ? normals() : light(); needN = false; }
+  gl.activeTexture(gl.TEXTURE0);
+  if (upload || isVideo() || mix) {
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, mix ? nc : source);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    upload = mix; // al salir de Mezcla hay que volver a subir el archivo sin iluminar
+  }
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+  gl.viewport(0, 0, w, h);
+  gl.useProgram(crtProg);
+  uniforms(crtProg, { src: 0, res: [w, h], vres: [vw, vh], srcSize: [sw, sh], crtX: mix ? [.5, .5] : [1, 0], dotSize: v('dotSize'),
+    slotH: v('slotH'), gap: v('gap'), soft: v('soft'), bright: v('bright') * GAIN });
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  // Pasada 2: glow + curva + vista -> pantalla
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.activeTexture(gl.TEXTURE1);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.viewport(0, 0, cw, h);
+  gl.useProgram(postProg);
+  uniforms(postProg, { crt: 1, src: 0, res: [cw, h], crtRes: [w, h], srcSize: [sw, sh], rawX: mix ? [.5, 0] : [1, 0],
+    glowR: sc, glowI: v('glowI'), curve: v('curve'), compare: +cmp });
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+requestAnimationFrame(frame);
+
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// Se descarga lo que se ve (en Compare sale el antes/después); en Normales, siempre el mapa a tamaño original
+$('save').onclick = () => {
+  if (mode() === 'nrm') {
+    if (!N) return;
+    tctx.putImageData(N.map, 0, 0);
+    return tmp.toBlob(b => download(b, 'normals.png'));
+  }
+  if (!animated()) { dirty = true; render(performance.now()); return out.toBlob(b => download(b, 'crt.png')); } // dibujar y leer en el mismo turno
+  // Vídeo o GIF: se reproduce una vez desde el principio y se graba el canvas en tiempo real
+  // ponytail: sin audio, a tiempo real (la pestaña debe seguir visible) y el GIF sale como vídeo;
+  // para audio o fotograma a fotograma, WebCodecs; para exportar .gif haría falta un codificador GIF.
+  const vid = isVideo() && source, chunks = [];
+  const mp4 = MediaRecorder.isTypeSupported('video/mp4');
+  const rec = new MediaRecorder(out.captureStream(), { mimeType: mp4 ? 'video/mp4' : 'video/webm', videoBitsPerSecond: 20e6 });
+  rec.ondataavailable = e => chunks.push(e.data);
+  rec.onstop = () => {
+    download(new Blob(chunks, { type: rec.mimeType }), mp4 ? 'crt.mp4' : 'crt.webm');
+    if (vid) { vid.loop = true; vid.play(); }
+    $('save').disabled = false; label();
+  };
+  if (vid) {
+    // Orden: rebobinar -> arrancar grabadora -> reproducir, para no perder el principio
+    vid.onended = () => rec.stop();
+    vid.pause(); vid.loop = false;
+    vid.onseeked = () => { vid.onseeked = null; rec.start(); };
+    rec.onstart = () => vid.play();
+    vid.currentTime = 0;
+  } else {
+    rec.onstart = () => { anim.t0 = performance.now(); setTimeout(() => rec.stop(), Math.ceil(3000 / anim.total) * anim.total); }; // bucles enteros, mínimo ~3 s
+    rec.start();
+  }
+  $('save').disabled = true; $('save').textContent = 'Recording…';
+};
+
+// ---------- Normales para pixel art (CPU, a resolución del sprite) ----------
+// Método de Pixel Art Lighter (moonfell-rpg.com/pixel-lighter, MIT), reescrito y recortado:
+// el relieve sale sobre todo del sombreado que ya tiene el dibujo, y cada mancha de color recibe
+// UNA dirección plana, redondeada a 8 direcciones y 4 inclinaciones. Nada de volumen 3D continuo.
+// ponytail: sin preset Arquitectura, sin máscara de luz y sin edición a mano; añadir si se echan en falta.
+const PRESETS = { // cap: px de borde que cuentan; convex: peso de la silueta; lum: peso del brillo; facets: facilidad para partir manchas grandes
+  character: { cap: 8, convex: .65, lum: 1.2, strength: .65, facets: 15 },
+  object: { cap: 16, convex: .65, lum: 2.1, strength: 1, facets: 35 },
+  terrain: { cap: 16, convex: .12, lum: 4, strength: 1.1, facets: 50 },
+};
+const nc = $('nrm'), nctx = nc.getContext('2d');
+const tmp = document.createElement('canvas'), tctx = tmp.getContext('2d', { willReadFrequently: true });
+const LIN = Float32Array.from({ length: 256 }, (_, i) => (i / 255) ** 2.2);                 // sRGB -> luz lineal
+const SRGB = Uint8Array.from({ length: 1025 }, (_, i) => 255 * (i / 1024) ** (1 / 2.2));    // y vuelta
+let N = null, lightPos = null;
+
+function quantize(x, y, z, out, o) { // 8 direcciones de brújula x 4 inclinaciones (o plano de frente)
+  const tilt = Math.hypot(x, y) / (Math.hypot(x, y, z) || 1);
+  if (tilt < .12) { out[o] = out[o + 1] = 0; out[o + 2] = 1; return; }
+  const angle = Math.round(Math.atan2(y, x) / (Math.PI / 4)) * Math.PI / 4;
+  const el = tilt < .3 ? .24 : tilt < .6 ? .48 : tilt < .85 ? .72 : .9;
+  out[o] = Math.cos(angle) * el; out[o + 1] = Math.sin(angle) * el; out[o + 2] = Math.sqrt(1 - el * el);
+}
+
+// Todo son bucles sobre arrays tipados, sin crear objetos por píxel: es lo que lo hace rápido.
+function normals() {
+  const [w, h] = size(), n = w * h;
+  if (!n) return;
+  tmp.width = w; tmp.height = h;
+  tctx.drawImage(source, 0, 0);
+  const alb = tctx.getImageData(0, 0, w, h).data, px = new Uint32Array(alb.buffer, alb.byteOffset, n);
+  const P = PRESETS[$('ntype').value], scale = P.strength * v('nstr'), facets = v('facets');
+
+  // Silueta: alfa; si la imagen no tiene transparencia, el color de la esquina superior izquierda es el fondo
+  const opaque = alb[3] > 127, inside = new Uint8Array(n), lum = new Float32Array(n);
+  let lo = 1, hi = 0;
+  for (let i = 0; i < n; i++) {
+    inside[i] = opaque ? px[i] !== px[0] : alb[i * 4 + 3] > 127;
+    lum[i] = (.2126 * alb[i * 4] + .7152 * alb[i * 4 + 1] + .0722 * alb[i * 4 + 2]) / 255;
+    if (inside[i]) { if (lum[i] < lo) lo = lum[i]; if (lum[i] > hi) hi = lum[i]; }
+  }
+  const range = hi - lo;
+
+  // Manchas de color: píxeles conectados (4 vecinos) con exactamente el mismo color.
+  // order guarda los píxeles agrupados por mancha; la mancha c ocupa order[start[c] .. start[c+1])
+  const lab = new Int32Array(n).fill(-1), order = new Int32Array(n), start = [];
+  let tail = 0;
+  for (let i = 0; i < n; i++) if (inside[i] && lab[i] < 0) {
+    const id = start.length, color = px[i];
+    start.push(tail);
+    lab[i] = id; order[tail++] = i;
+    for (let q = start[id]; q < tail; q++) {
+      const p = order[q], x = p % w;
+      if (x && lab[p - 1] < 0 && inside[p - 1] && px[p - 1] === color) { lab[p - 1] = id; order[tail++] = p - 1; }
+      if (x < w - 1 && lab[p + 1] < 0 && inside[p + 1] && px[p + 1] === color) { lab[p + 1] = id; order[tail++] = p + 1; }
+      if (p >= w && lab[p - w] < 0 && inside[p - w] && px[p - w] === color) { lab[p - w] = id; order[tail++] = p - w; }
+      if (p < n - w && lab[p + w] < 0 && inside[p + w] && px[p + w] === color) { lab[p + w] = id; order[tail++] = p + w; }
+    }
+  }
+  start.push(tail);
+
+  // Distancia al borde de la silueta (chamfer en dos pasadas); fuera de la imagen cuenta como borde
+  const d = new Float32Array(n);
+  for (let i = 0; i < n; i++) if (inside[i]) { // pasada hacia delante: vecinos de la izquierda y de arriba
+    const x = i % w, up = i >= w;
+    let m = (x ? d[i - 1] : 0) + 1, t = (up ? d[i - w] : 0) + 1;
+    if (t < m) m = t;
+    t = (up && x ? d[i - w - 1] : 0) + 1.414; if (t < m) m = t;
+    t = (up && x < w - 1 ? d[i - w + 1] : 0) + 1.414; if (t < m) m = t;
+    d[i] = m;
+  }
+  for (let i = n - 1; i >= 0; i--) if (inside[i]) { // pasada hacia atrás: derecha y abajo
+    const x = i % w, down = i < n - w;
+    let m = d[i], t = (x < w - 1 ? d[i + 1] : 0) + 1;
+    if (t < m) m = t;
+    t = (down ? d[i + w] : 0) + 1; if (t < m) m = t;
+    t = (down && x < w - 1 ? d[i + w + 1] : 0) + 1.414; if (t < m) m = t;
+    t = (down && x ? d[i + w - 1] : 0) + 1.414; if (t < m) m = t;
+    d[i] = m;
+  }
+
+  // Relieve: un poco de abombado desde el borde + el brillo del dibujo; suavizado dentro de la silueta (Borde)
+  let field = new Float32Array(n), blurred = new Float32Array(n);
+  for (let i = 0; i < n; i++) if (inside[i])
+    field[i] = Math.sqrt(Math.min(d[i], P.cap)) * P.convex + (range > 1e-5 ? (lum[i] - lo) / range : .75) * P.lum;
+  for (let pass = 0; pass < v('edge'); pass++) {
+    for (let i = 0; i < n; i++) if (inside[i]) {
+      const x = i % w;
+      let sum = field[i] * 2, count = 2;
+      if (x && inside[i - 1]) { sum += field[i - 1]; count++; }
+      if (x < w - 1 && inside[i + 1]) { sum += field[i + 1]; count++; }
+      if (i >= w && inside[i - w]) { sum += field[i - w]; count++; }
+      if (i < n - w && inside[i + w]) { sum += field[i + w]; count++; }
+      blurred[i] = sum / count;
+    }
+    [field, blurred] = [blurred, field];
+  }
+
+  // Normal por píxel (solo como paso intermedio). Verde = Y hacia arriba (convención OpenGL, la de Unity)
+  const dirs = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) if (inside[i]) {
+    const x = i % w, c = field[i];
+    const dx = (x < w - 1 && inside[i + 1] ? field[i + 1] : c) - (x && inside[i - 1] ? field[i - 1] : c);
+    const dy = (i < n - w && inside[i + w] ? field[i + w] : c) - (i >= w && inside[i - w] ? field[i - w] : c);
+    const nx = -dx * scale, ny = dy * scale, len = Math.sqrt(nx * nx + ny * ny + 1); // sqrt: Math.hypot es mucho más lento
+    dirs[i * 3] = nx / len; dirs[i * 3 + 1] = ny / len; dirs[i * 3 + 2] = 1 / len;
+  }
+
+  // Una dirección plana por mancha; las manchas grandes se parten en caras si sus lados miran a sitios distintos.
+  // Caras posibles: 4 lados (por cuadrante de 90°) + la de frente
+  const flat = new Float32Array(n * 3), thin = new Uint8Array(start.length - 1);
+  const face = new Uint8Array(n), fs = new Float64Array(15), fc = new Int32Array(5), fq = new Float32Array(15), base = new Float32Array(3);
+  for (let c = 0; c < start.length - 1; c++) {
+    const a = start[c], b = start[c + 1], count = b - a;
+    let sx = 0, sy = 0, sz = 0, interior = 0;
+    fs.fill(0); fc.fill(0);
+    for (let q = a; q < b; q++) {
+      const p = order[q], gx = dirs[p * 3], gy = dirs[p * 3 + 1], x = p % w;
+      sx += gx; sy += gy; sz += dirs[p * 3 + 2];
+      const k = face[p] = gx * gx + gy * gy > .1225 ? (Math.abs(gx) >= Math.abs(gy) ? (gx > 0 ? 0 : 2) : gy > 0 ? 1 : 3) : 4; // lado al que mira, o 4 = de frente
+      fs[k * 3] += gx; fs[k * 3 + 1] += gy; fs[k * 3 + 2] += dirs[p * 3 + 2]; fc[k]++;
+      if (x && x < w - 1 && p >= w && p < n - w && lab[p - 1] === c && lab[p + 1] === c && lab[p - w] === c && lab[p + w] === c) interior++;
+    }
+    // Contorno: mancha de 1-2 px, u oscura y fina. Heredará la dirección de lo que tiene al lado
+    thin[c] = $('merge').checked && (count <= 2 || lum[order[a]] <= lo + range * .24 && interior / count < .15);
+    quantize(sx, sy, sz, base, 0);
+
+    let split = false;
+    if (facets > 0 && count >= Math.round(180 - facets * 1.1)) {
+      const min = Math.max(16, count * .16);
+      for (let i = 0; i < 5; i++) for (let j = 0; j < i; j++) if (fc[i] >= min && fc[j] >= min) {
+        const li = Math.hypot(fs[i * 3], fs[i * 3 + 1], fs[i * 3 + 2]), lj = Math.hypot(fs[j * 3], fs[j * 3 + 1], fs[j * 3 + 2]);
+        if ((fs[i * 3] * fs[j * 3] + fs[i * 3 + 1] * fs[j * 3 + 1] + fs[i * 3 + 2] * fs[j * 3 + 2]) / (li * lj) < .8 - facets * .001) split = true;
+      }
+      if (split) for (let k = 0; k < 5; k++) {
+        if (fc[k] >= min) quantize(fs[k * 3], fs[k * 3 + 1], fs[k * 3 + 2], fq, k * 3);
+        else fq.set(base, k * 3);
+      }
+    }
+    for (let q = a; q < b; q++) {
+      const p = order[q], src = split ? fq : base, o = split ? face[p] * 3 : 0;
+      flat[p * 3] = src[o]; flat[p * 3 + 1] = src[o + 1]; flat[p * 3 + 2] = src[o + 2];
+    }
+  }
+
+  // Los contornos heredan por cercanía, propagando desde todo lo que no es contorno (reutiliza order como cola)
+  const done = new Uint8Array(n);
+  tail = 0;
+  for (let i = 0; i < n; i++) if (inside[i] && !thin[lab[i]]) { done[i] = 1; order[tail++] = i; }
+  const take = (k, p) => { done[k] = 1; flat[k * 3] = flat[p * 3]; flat[k * 3 + 1] = flat[p * 3 + 1]; flat[k * 3 + 2] = flat[p * 3 + 2]; order[tail++] = k; };
+  for (let q = 0; q < tail; q++) {
+    const p = order[q], x = p % w;
+    if (x && inside[p - 1] && !done[p - 1]) take(p - 1, p);
+    if (x < w - 1 && inside[p + 1] && !done[p + 1]) take(p + 1, p);
+    if (p >= w && inside[p - w] && !done[p - w]) take(p - w, p);
+    if (p < n - w && inside[p + w] && !done[p + w]) take(p + w, p);
+  }
+
+  const map = new ImageData(w, h), m = map.data;
+  for (let i = 0; i < n; i++) if (inside[i]) {
+    m[i * 4] = (flat[i * 3] + 1) * 127.5; m[i * 4 + 1] = (flat[i * 3 + 1] + 1) * 127.5; m[i * 4 + 2] = (flat[i * 3 + 2] + 1) * 127.5; m[i * 4 + 3] = 255;
+  }
+  N = { w, h, alb, inside, dirs: flat, map, img: new ImageData(w, h), albedo: new ImageData(alb, w, h) };
+  light();
+}
+
+// Dibuja los paneles del canvas de normales, con una luz puntual en el ratón.
+// Normales: sprite iluminado | mapa, o solo uno de los dos según la vista.
+// Mezcla: siempre albedo | sprite iluminado, que es la textura de entrada del CRT.
+function light() {
+  if (!N) return;
+  const { w, h, alb, inside, dirs, map, img, albedo } = N, mix = mode() === 'mix', o = img.data, big = Math.max(w, h);
+  const panels = mix ? [albedo, img] : show === 'both' ? [img, map] : show === 'map' ? [map] : [img];
+  if (nc.width !== panels.length * w || nc.height !== h) { nc.width = panels.length * w; nc.height = h; }
+  const [lx, ly] = lightPos || [w * .25, h * .2], lz = big * v('lz'), r2 = (big * v('lr')) ** 2;
+  if (panels.includes(img)) for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) {
+    let k = .15; // luz ambiente (y fondo)
+    if (inside[i]) {
+      const dx = lx - x, dy = y - ly, d2 = dx * dx + dy * dy + lz * lz;
+      const dot = dirs[i * 3] * dx + dirs[i * 3 + 1] * dy + dirs[i * 3 + 2] * lz;
+      if (dot > 0) k += 2.5 * dot / Math.sqrt(d2) / (1 + d2 / r2);
+    }
+    k *= 1024; // se ilumina en luz lineal; SRGB[] devuelve a pantalla
+    o[i * 4] = SRGB[Math.min(1024, LIN[alb[i * 4]] * k) | 0];
+    o[i * 4 + 1] = SRGB[Math.min(1024, LIN[alb[i * 4 + 1]] * k) | 0];
+    o[i * 4 + 2] = SRGB[Math.min(1024, LIN[alb[i * 4 + 2]] * k) | 0];
+    o[i * 4 + 3] = alb[i * 4 + 3];
+  }
+  panels.forEach((p, i) => nctx.putImageData(p, i * w, 0));
+}
+// La luz sigue al ratón: posición en píxeles del sprite (object-fit: contain deja márgenes dentro del canvas)
+function moveLight(e) {
+  if (!N) return;
+  // Posición 0..1 dentro de la imagen dibujada, sea cual sea la resolución del canvas (el de Normales
+  // mide 2 sprites de ancho; el del CRT, la salida ampliada) y los márgenes de object-fit: contain
+  const c = e.target, r = c.getBoundingClientRect(), s = Math.min(r.width / c.width, r.height / c.height);
+  let u = (e.clientX - r.left - (r.width - c.width * s) / 2) / (c.width * s);
+  const t = (e.clientY - r.top - (r.height - c.height * s) / 2) / (c.height * s);
+  u = u * (c === nc ? nc.width / N.w : show === 'both' ? 2 : 1) % 1; // con dos paneles, la luz cae en el mismo punto del sprite en ambos
+  lightPos = [u * N.w, t * N.h];
+  dirty = true;
+}
+nc.onpointermove = moveLight;
+out.onpointermove = e => { if (mode() === 'mix') moveLight(e); };
+
+// Autocomprobación: abrir con #test. Tres franjas de oscura a clara: cada franja es un plano único
+// y la del medio mira hacia la izquierda (el relieve sube hacia lo claro).
+if (location.hash === '#test') {
+  source = new OffscreenCanvas(32, 32);
+  const c = source.getContext('2d');
+  ['#333', '#888', '#eee'].forEach((col, i) => { c.fillStyle = col; c.fillRect(1 + i * 10, 1, 10, 30); });
+  normals();
+  const at = (x, y) => (y * 32 + x) * 3, mid = [...N.dirs.slice(at(15, 16), at(15, 16) + 3)];
+  console.assert(mid[0] < 0 && Math.abs(mid[1]) < 1e-6, 'la franja media mira a la izquierda', mid);
+  for (let y = 1; y < 31; y++) for (let x = 11; x < 21; x++)
+    console.assert(N.dirs[at(x, y)] === mid[0] && N.dirs[at(x, y) + 2] === mid[2], 'franja no plana en', x, y);
+  console.assert(N.map.data[3] === 0, 'fondo transparente');
+  console.log('test normales OK si no hay aserciones arriba');
+}
+</script>
+</body>
+</html>

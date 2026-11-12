@@ -6,6 +6,7 @@ import { site } from "../data/content.js";
 const LINKS = [
   { href: "#hellshot", label: "Games" },
   { href: "#pixel-art", label: "Pixel Art" },
+  { href: "/tools/index.html", label: "Tools" }, // página estática en public/tools (herramienta CRT y normales)
   { href: "#about", label: "About" },
   { href: "#skills", label: "Skills" },
   { href: "#contact", label: "Contact" },
